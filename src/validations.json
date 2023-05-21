@@ -1,0 +1,5 @@
+{
+    "do_not_delete": [
+        "aws_mq_broker.main"
+    ]
+}

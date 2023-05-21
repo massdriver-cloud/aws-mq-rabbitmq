@@ -1,0 +1,128 @@
+schema: draft-07
+name: "aws-rabbitmq-broker"
+description: "AWS MQ Broker for RabbitMQ is a managed message broker service that simplifies the deployment and maintenance of RabbitMQ in the AWS cloud."
+source_url: github.com/massdriver-cloud/aws-mq-rabbitmq
+type: infrastructure
+
+params:
+  # examples:
+  #   - __name: Development
+  #     foo: bar
+  #   - __name: Production
+  #     foo: foo
+  required:
+    - broker
+  properties:
+    broker:
+      type: object
+      title: RabbitMQ Broker Settings
+      required:
+        - deployment_mode
+        - engine_version
+        - instance_type
+        - apply_immediately
+      properties:
+        deployment_mode:
+          title: Deployment Mode
+          description: foo
+          type: string
+          $md.immutable: true
+          default: SINGLE_INSTANCE
+          oneOf:
+            - title: Single Instance
+              const: SINGLE_INSTANCE
+            - title: Highly Available Cluster
+              const: CLUSTER_MULTI_AZ
+        engine_version:
+          title: Engine Version
+          description: RabbitMQ engine version
+          type: string
+          default: "3.10"
+          enum:
+            - "3.10"
+            - "3.9"
+            - "3.8"
+        instance_type:
+          title: Instance Type
+          description: "**Note:** You cannot downgrade a broker from any `mq.m5.*` instance type to the `mq.t3.micro` instance type."
+          type: string
+        apply_immediately:
+          title: Apply Changes Immediately
+          description: Specifies whether any broker modifications are applied immediately, or during the next maintenance window.
+          type: boolean
+          default: false
+      dependencies:
+        deployment_mode:
+          oneOf:
+          - properties:
+              deployment_mode:
+                const: SINGLE_INSTANCE
+              instance_type:
+                oneOf:
+                  - title: mq.t3.micro (2 CPU & 1GiB RAM)
+                    const: mq.t3.micro
+                  - title: mq.m5.large (2 CPU & 8GiB RAM)
+                    const: mq.m5.large
+                  - title: mq.m5.xlarge (4 CPU & 16GiB RAM)
+                    const: mq.m5.xlarge
+                  - title: mq.m5.2xlarge (8 CPU & 32GiB RAM)
+                    const: mq.m5.2xlarge
+                  - title: mq.m5.4xlarge (16 CPU & 64GiB RAM)
+                    const: mq.m5.4xlarge
+          - properties:
+              deployment_mode:
+                const: CLUSTER_MULTI_AZ
+              instance_type:
+                oneOf:
+                  - title: mq.m5.large (2 CPU & 8GiB RAM)
+                    const: mq.m5.large
+                  - title: mq.m5.xlarge (4 CPU & 16GiB RAM)
+                    const: mq.m5.xlarge
+                  - title: mq.m5.2xlarge (8 CPU & 32GiB RAM)
+                    const: mq.m5.2xlarge
+                  - title: mq.m5.4xlarge (16 CPU & 64GiB RAM)
+                    const: mq.m5.4xlarge
+    monitoring:
+      title: Monitoring
+      type: object
+      required:
+        - general_logging
+      properties:
+        general_logging:
+          title: Enable Logging
+          description: Enables cluster logging to AWS Cloudwatch
+          type: boolean
+          default: false
+        
+
+connections:
+  required:
+  - aws_authentication
+  - vpc
+  properties:
+    aws_authentication:
+      $ref: massdriver/aws-iam-role
+    vpc:
+      $ref: massdriver/aws-vpc
+
+
+artifacts:
+  required:
+    - rabbitmq
+  properties:
+    rabbitmq:
+      $ref: massdriver/rabbitmq-authentication
+
+ui:
+  ui:order:
+    - broker
+    - monitoring
+    - "*"
+  broker:
+    ui:order:
+      - deployment_mode
+      - engine_version
+      - instance_type
+      - apply_immediately
+    # engine_version:
+    #   ui:field: versioningDropdown
