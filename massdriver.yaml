@@ -93,7 +93,7 @@ params:
           description: Enables cluster logging to AWS Cloudwatch
           type: boolean
           default: false
-        
+
 
 connections:
   required:

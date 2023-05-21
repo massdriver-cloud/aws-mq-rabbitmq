@@ -56,91 +56,16 @@ Form input parameters for configuring a bundle for deployment.
 <!-- PARAMS:START -->
 ## Properties
 
-- **`core_services`** *(object)*: Configure core services in Kubernetes for Massdriver to manage.
-  - **`enable_efs_csi`** *(boolean)*: Enabling this will install the AWS EFS storage controller into your cluster, allowing you to provision persistent volumes backed by EFS file systems. Default: `False`.
-  - **`enable_ingress`** *(boolean)*: Enabling this will create an nginx ingress controller in the cluster, allowing internet traffic to flow into web accessible services within the cluster. Default: `False`.
-  - **`route53_hosted_zones`** *(array)*: Route53 Hosted Zones to associate with this cluster. Enables Kubernetes to automatically manage DNS records and SSL certificates. Hosted Zones can be configured at https://app.massdriver.cloud/dns-zones. Default: `[]`.
-    - **Items** *(string)*: .
-
-      Examples:
-      ```json
-      "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-      ```
-
-      ```json
-      "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-      ```
-
-- **`k8s_version`** *(string)*: The version of Kubernetes to run. Must be one of: `['1.21', '1.22', '1.23', '1.24']`.
-- **`node_groups`** *(array)*
-  - **Items** *(object)*: Definition of a node group.
-    - **`advanced_configuration_enabled`** *(boolean)*: Default: `False`.
-    - **`instance_type`** *(string)*: Instance type to use in the node group.
-      - **One of**
-        - C5 High-CPU Large (2 vCPUs, 4.0 GiB)
-        - C5 High-CPU Extra Large (4 vCPUs, 8.0 GiB)
-        - C5 High-CPU Double Extra Large (8 vCPUs, 16.0 GiB)
-        - C5 High-CPU Quadruple Extra Large (16 vCPUs, 32.0 GiB)
-        - C5 High-CPU 9xlarge (36 vCPUs, 72.0 GiB)
-        - C5 High-CPU 12xlarge (48 vCPUs, 96.0 GiB)
-        - C5 High-CPU 18xlarge (72 vCPUs, 144.0 GiB)
-        - C5 High-CPU 24xlarge (96 vCPUs, 192.0 GiB)
-        - M5 General Purpose Large (2 vCPUs, 8.0 GiB)
-        - M5 General Purpose Extra Large (4 vCPUs, 16.0 GiB)
-        - M5 General Purpose Double Extra Large (8 vCPUs, 32.0 GiB)
-        - M5 General Purpose Quadruple Extra Large (16 vCPUs, 64.0 GiB)
-        - M5 General Purpose Eight Extra Large (32 vCPUs, 128.0 GiB)
-        - M5 General Purpose 12xlarge (48 vCPUs, 192.0 GiB)
-        - M5 General Purpose 16xlarge (64 vCPUs, 256.0 GiB)
-        - M5 General Purpose 24xlarge (96 vCPUs, 384.0 GiB)
-        - T3 Small (2 vCPUs for a 4h 48m burst, 2.0 GiB)
-        - T3 Medium (2 vCPUs for a 4h 48m burst, 4.0 GiB)
-        - T3 Large (2 vCPUs for a 7h 12m burst, 8.0 GiB)
-        - T3 Extra Large (4 vCPUs for a 9h 36m burst, 16.0 GiB)
-        - T3 Double Extra Large (8 vCPUs for a 9h 36m burst, 32.0 GiB)
-        - P2 General Purpose GPU Extra Large (4 vCPUs, 61.0 GiB)
-        - P2 General Purpose GPU Eight Extra Large (32 vCPUs, 488.0 GiB)
-        - P2 General Purpose GPU 16xlarge (64 vCPUs, 732.0 GiB)
-        - A1 General Purpose ARM Medium (1 vCPUs, 2.0 GiB)
-        - A1 General Purpose ARM Large (2 vCPUs, 4.0 GiB)
-        - A1 General Purpose ARM Extra Large (4 vCPUs, 8.0 GiB)
-        - A1 General Purpose ARM Double Extra Large (8 vCPUs, 16.0 GiB)
-        - A1 General Purpose ARM Quadruple Extra Large (16 vCPUs, 32.0 GiB)
-    - **`max_size`** *(integer)*: Maximum number of instances in the node group. Minimum: `0`. Default: `10`.
-    - **`min_size`** *(integer)*: Minimum number of instances in the node group. Minimum: `0`. Default: `1`.
-    - **`name_suffix`** *(string)*: The name of the node group. Default: ``.
-## Examples
-
-  ```json
-  {
-      "__name": "Development",
-      "k8s_version": "1.24",
-      "node_groups": [
-          {
-              "instance_type": "t3.medium",
-              "max_size": 10,
-              "min_size": 1,
-              "name_suffix": "shared"
-          }
-      ]
-  }
-  ```
-
-  ```json
-  {
-      "__name": "Production",
-      "k8s_version": "1.24",
-      "node_groups": [
-          {
-              "instance_type": "c5.2xlarge",
-              "max_size": 10,
-              "min_size": 1,
-              "name_suffix": "shared"
-          }
-      ]
-  }
-  ```
-
+- **`broker`** *(object)*
+  - **`apply_immediately`** *(boolean)*: Specifies whether any broker modifications are applied immediately, or during the next maintenance window. Default: `False`.
+  - **`deployment_mode`** *(string)*: foo. Default: `SINGLE_INSTANCE`.
+    - **One of**
+      - Single Instance
+      - Highly Available Cluster
+  - **`engine_version`** *(string)*: RabbitMQ engine version. Must be one of: `['3.10', '3.9', '3.8']`. Default: `3.10`.
+  - **`instance_type`** *(string)*: **Note:** You cannot downgrade a broker from any `mq.m5.*` instance type to the `mq.t3.micro` instance type.
+- **`monitoring`** *(object)*
+  - **`general_logging`** *(boolean)*: Enables cluster logging to AWS Cloudwatch. Default: `False`.
 <!-- PARAMS:END -->
 
 </details>
@@ -313,17 +238,16 @@ Resources created by this bundle that can be connected to other bundles.
 <!-- ARTIFACTS:START -->
 ## Properties
 
-- **`kubernetes_cluster`** *(object)*: Kubernetes cluster authentication and cloud-specific configuration. Cannot contain additional properties.
+- **`rabbitmq`** *(object)*: RabbitMQ cluster authentication.
   - **`data`** *(object)*
-    - **`authentication`** *(object)*
-      - **`cluster`** *(object)*
-        - **`certificate-authority-data`** *(string)*
-        - **`server`** *(string)*
-      - **`user`** *(object)*
-        - **`token`** *(string)*
-    - **`infrastructure`** *(object)*: Cloud specific Kubernetes configuration data.
+    - **`authentication`**: RabbitMQ Authentication.
+      - **`hostname`** *(string)*
+      - **`password`** *(string)*
+      - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
+      - **`username`** *(string)*
+    - **`infrastructure`** *(object)*: Cloud specific RabbitMQ infrastructure configuration.
       - **One of**
-        - AWS EKS infrastructure config*object*: . Cannot contain additional properties.
+        - AWS Infrastructure ARN*object*: Minimal AWS Infrastructure Config. Cannot contain additional properties.
           - **`arn`** *(string)*: Amazon Resource Name.
 
             Examples:
@@ -335,103 +259,55 @@ Resources created by this bundle that can be connected to other bundles.
             "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
             ```
 
-          - **`oidc_issuer_url`** *(string)*: An HTTPS endpoint URL.
+        - Kuberenetes infrastructure config*object*: . Cannot contain additional properties.
+          - **`kubernetes_namespace`** *(string)*
+          - **`kubernetes_service`** *(string)*
+    - **`security`** *(object)*
+      - **Any of**
+        - AWS Security information*object*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
+          - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
+            - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
+              - **`policy_arn`** *(string)*: AWS IAM policy ARN.
 
-            Examples:
-            ```json
-            "https://example.com/some/path"
-            ```
+                Examples:
+                ```json
+                "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
+                ```
 
-            ```json
-            "https://massdriver.cloud"
-            ```
+                ```json
+                "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
+                ```
 
-        - Infrastructure Config*object*: Azure AKS Infrastructure Configuration. Cannot contain additional properties.
-          - **`ari`** *(string)*: Azure Resource ID.
+          - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
+            - **`role_arn`** *(string)*: ARN for this resources IAM Role.
 
-            Examples:
-            ```json
-            "/subscriptions/12345678-1234-1234-abcd-1234567890ab/resourceGroups/resource-group-name/providers/Microsoft.Network/virtualNetworks/network-name"
-            ```
+              Examples:
+              ```json
+              "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
+              ```
 
-          - **`oidc_issuer_url`** *(string)*
-        - GCP Infrastructure GRN*object*: Minimal GCP Infrastructure Config. Cannot contain additional properties.
-          - **`grn`** *(string)*: GCP Resource Name (GRN).
+              ```json
+              "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
+              ```
 
-            Examples:
-            ```json
-            "projects/my-project/global/networks/my-global-network"
-            ```
+          - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
+            - **`^[a-z-]+$`** *(object)*
+              - **`arn`** *(string)*: Amazon Resource Name.
 
-            ```json
-            "projects/my-project/regions/us-west2/subnetworks/my-subnetwork"
-            ```
+                Examples:
+                ```json
+                "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
+                ```
 
-            ```json
-            "projects/my-project/topics/my-pubsub-topic"
-            ```
+                ```json
+                "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
+                ```
 
-            ```json
-            "projects/my-project/subscriptions/my-pubsub-subscription"
-            ```
-
-            ```json
-            "projects/my-project/locations/us-west2/instances/my-redis-instance"
-            ```
-
-            ```json
-            "projects/my-project/locations/us-west2/clusters/my-gke-cluster"
-            ```
-
+              - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
+              - **`protocol`** *(string)*: Must be one of: `['tcp', 'udp']`.
   - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
-      - **`region`** *(string)*: AWS Region to provision in.
-
-        Examples:
-        ```json
-        "us-west-2"
-        ```
-
-    - **`azure`** *(object)*: .
-      - **`region`** *(string)*: Select the Azure region you'd like to provision your resources in.
-    - **`gcp`** *(object)*: .
-      - **`project`** *(string)*
-      - **`region`** *(string)*: The GCP region to provision resources in.
-
-        Examples:
-        ```json
-        "us-east1"
-        ```
-
-        ```json
-        "us-east4"
-        ```
-
-        ```json
-        "us-west1"
-        ```
-
-        ```json
-        "us-west2"
-        ```
-
-        ```json
-        "us-west3"
-        ```
-
-        ```json
-        "us-west4"
-        ```
-
-        ```json
-        "us-central1"
-        ```
-
-    - **`kubernetes`** *(object)*: Kubernetes distribution and version specifications.
-      - **`cloud`** *(string)*: Must be one of: `['aws', 'gcp', 'azure']`.
-      - **`distribution`** *(string)*: Must be one of: `['eks', 'gke', 'aks']`.
-      - **`platform_version`** *(string)*
-      - **`version`** *(string)*
+    - **`rabbitmq`** *(object)*: RabbitMQ specific public information.
+      - **`version`** *(string)*: Currently deployed RabbitMQ version.
 <!-- ARTIFACTS:END -->
 
 </details>
