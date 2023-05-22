@@ -1,13 +1,13 @@
 module "kms" {
   source      = "github.com/massdriver-cloud/terraform-modules//aws/aws-kms-key?ref=afe781a"
   md_metadata = var.md_metadata
-  policy      = data.aws_iam_policy_document.s3.json
+  policy      = data.aws_iam_policy_document.kms.json
 }
 
 
 data "aws_caller_identity" "current" {}
 
-data "aws_iam_policy_document" "s3" {
+data "aws_iam_policy_document" "kms" {
   statement {
     sid = "Allow access to S3 for all principals in the account that are authorized to use S3"
     principals {
