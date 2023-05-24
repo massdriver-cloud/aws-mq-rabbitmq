@@ -1,5 +1,39 @@
-# Operator Guide
+# aws-mq-rabbitmq
+AWS MQ Broker for RabbitMQ is a managed message broker service that simplifies the deployment and maintenance of RabbitMQ in the AWS cloud.
 
-This is the guide for your bundle. It will appear under the `guide` button in Massdriver.
+## Use Cases
+### Asynchronous Messaging
+RabbitMQ is often used for asynchronous communication between different components of a distributed system. It allows decoupling of producers and consumers, where producers can send messages to RabbitMQ without waiting for an immediate response.
+### Financial Transaction Processing
+RabbitMQ's support of AMQP provides reliable, secure and efficient communication between financial institutions, facilitating seamless payment transactions and messaging workflows.
+### Microservice Architectures
+RabbitMQ facilitates communication and coordination between various microservices by acting as a message broker, allowing for asynchronous communication, event-driven architectures, and decoupling of services.
 
-Use it to describe to users how the bundle works, use cases for the bundle, and examples.
+## Configuration Presets
+### Single-Broker (Development)
+This preset creates small (mq.t3.micro) single instance broker which falls under AWS's "free tier". This is suitable for development and prototyping, but is not suitable for a production environment
+### Multi-Broker Cluster (Production)
+This preset creates a multi-broker cluster spread across multiple availability zones. The cluster will provide immense scalability, and high availability in the event of a broker failure or zonal outage, making it suitable for production workloads.
+
+## Design
+AWS MQ for RabbitMQ supports both "Single-Instance Broker" and "Multi-Broker Cluster" deployment modes.
+### Single-Instance Broker
+In a [single broker setup](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-single-instance.html), there is only one instance of RabbitMQ running, which handles all messaging and queuing operations. This configuration is suitable for small-scale deployments or scenarios with low message volume. It provides a simple setup with a single point of control and is easier to manage and monitor compared to a cluster. However, a single broker has limitations in terms of scalability and fault tolerance since all traffic is handled by a single instance.
+### Multi-Broker Cluster
+A [multi-broker cluster](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-cluster.html) consists of multiple RabbitMQ instances (brokers) connected together to form a distributed messaging system. Clustering enables improved scalability, high availability, and fault tolerance. Each broker in the cluster shares the message load and provides redundancy, ensuring that if one broker fails, others can continue to handle messaging operations. It allows for horizontal scaling by adding more brokers to the cluster, providing increased throughput and fault tolerance capabilities.
+
+## Best Practices
+### Automatic Minor Version Updates
+The RabbitMQ cluster will be kept up to date with all security patches through automatic minor version updates.
+### General Logging
+For diagnostics and auditing, general logging to AWS Cloudwatch is available
+
+## Security
+### Public Access Disabled
+Only private network access of the RabbitMQ cluster is allowed
+### Custom Security Group
+A custom VPC security group is associated with the RabbitMQ cluster providing fine-grained network access control.
+### KMS Encryption
+A custom KMS key is created and associated with the brokers to provide server-side encryption of data at rest
+### Encryption In-Flight
+Amazon MQ for RabbitMQ requires strong Transport Layer Security (TLS) encryption for all client connections.

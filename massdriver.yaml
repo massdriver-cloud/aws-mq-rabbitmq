@@ -5,13 +5,26 @@ source_url: github.com/massdriver-cloud/aws-mq-rabbitmq
 type: infrastructure
 
 params:
-  # examples:
-  #   - __name: Development
-  #     foo: bar
-  #   - __name: Production
-  #     foo: foo
+  examples:
+    - __name: Single-Broker (Development)
+      broker:
+        deployment_mode: SINGLE_INSTANCE
+        engine_version: "3.10"
+        instance_type: mq.t3.micro
+        apply_immediately: false
+      monitoring:
+        general_logging: false
+    - __name: Multi-Broker Cluster (Production)
+      broker:
+        deployment_mode: CLUSTER_MULTI_AZ
+        engine_version: "3.10"
+        instance_type: mq.m5.large
+        apply_immediately: false
+      monitoring:
+        general_logging: true
   required:
     - broker
+    - monitoring
   properties:
     broker:
       type: object
@@ -24,7 +37,7 @@ params:
       properties:
         deployment_mode:
           title: Deployment Mode
-          description: foo
+          description: "[Single instance](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-single-instance.html) will provision a cost-effective single broker suitable for development, while a [highly available cluster](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-cluster.html) will create multiple brokers spread accross availability zones providing massive scalability and high availability even in the event of zonal outage. **NOTE** this setting cannot be changed after creation."
           type: string
           $md.immutable: true
           default: SINGLE_INSTANCE

@@ -58,7 +58,7 @@ Form input parameters for configuring a bundle for deployment.
 
 - **`broker`** *(object)*
   - **`apply_immediately`** *(boolean)*: Specifies whether any broker modifications are applied immediately, or during the next maintenance window. Default: `False`.
-  - **`deployment_mode`** *(string)*: foo. Default: `SINGLE_INSTANCE`.
+  - **`deployment_mode`** *(string)*: [Single instance](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-single-instance.html) will provision a cost-effective single broker suitable for development, while a [highly available cluster](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-cluster.html) will create multiple brokers spread accross availability zones providing massive scalability and high availability even in the event of zonal outage. **NOTE** this setting cannot be changed after creation. Default: `SINGLE_INSTANCE`.
     - **One of**
       - Single Instance
       - Highly Available Cluster
@@ -66,6 +66,38 @@ Form input parameters for configuring a bundle for deployment.
   - **`instance_type`** *(string)*: **Note:** You cannot downgrade a broker from any `mq.m5.*` instance type to the `mq.t3.micro` instance type.
 - **`monitoring`** *(object)*
   - **`general_logging`** *(boolean)*: Enables cluster logging to AWS Cloudwatch. Default: `False`.
+## Examples
+
+  ```json
+  {
+      "__name": "Single-Broker (Development)",
+      "broker": {
+          "apply_immediately": false,
+          "deployment_mode": "SINGLE_INSTANCE",
+          "engine_version": "3.10",
+          "instance_type": "mq.t3.micro"
+      },
+      "monitoring": {
+          "general_logging": false
+      }
+  }
+  ```
+
+  ```json
+  {
+      "__name": "Multi-Broker Cluster (Production)",
+      "broker": {
+          "apply_immediately": false,
+          "deployment_mode": "CLUSTER_MULTI_AZ",
+          "engine_version": "3.10",
+          "instance_type": "mq.m5.large"
+      },
+      "monitoring": {
+          "general_logging": true
+      }
+  }
+  ```
+
 <!-- PARAMS:END -->
 
 </details>
