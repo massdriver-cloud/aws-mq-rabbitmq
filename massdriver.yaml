@@ -1,0 +1,189 @@
+schema: draft-07
+name: aws-mq-rabbitmq
+description: "AWS MQ Broker for RabbitMQ is a managed message broker service that simplifies the deployment and maintenance of RabbitMQ in the AWS cloud."
+source_url: github.com/massdriver-cloud/aws-mq-rabbitmq
+type: infrastructure
+
+params:
+  examples:
+    - __name: Single-Broker (Development)
+      broker:
+        deployment_mode: SINGLE_INSTANCE
+        engine_version: "3.10"
+        instance_type: mq.t3.micro
+        apply_immediately: false
+      monitoring:
+        general_logging: false
+    - __name: Multi-Broker Cluster (Production)
+      broker:
+        deployment_mode: CLUSTER_MULTI_AZ
+        engine_version: "3.10"
+        instance_type: mq.m5.large
+        apply_immediately: false
+      monitoring:
+        general_logging: true
+  required:
+    - broker
+    - monitoring
+  properties:
+    broker:
+      type: object
+      title: RabbitMQ Broker Settings
+      required:
+        - deployment_mode
+        - engine_version
+        - instance_type
+        - apply_immediately
+      properties:
+        deployment_mode:
+          title: Deployment Mode
+          description: "[Single instance](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-single-instance.html) will provision a cost-effective single broker suitable for development, while a [highly available cluster](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-cluster.html) will create multiple brokers spread accross availability zones providing massive scalability and high availability even in the event of zonal outage. **NOTE** this setting cannot be changed after creation."
+          type: string
+          $md.immutable: true
+          default: SINGLE_INSTANCE
+          oneOf:
+            - title: Single Instance
+              const: SINGLE_INSTANCE
+            - title: Highly Available Cluster
+              const: CLUSTER_MULTI_AZ
+        engine_version:
+          title: Engine Version
+          description: RabbitMQ engine version
+          type: string
+          default: "3.10"
+          enum:
+            - "3.10"
+            - "3.9"
+            - "3.8"
+        instance_type:
+          title: Instance Type
+          description: "**Note:** You cannot downgrade a broker from any `mq.m5.*` instance type to the `mq.t3.micro` instance type."
+          type: string
+        apply_immediately:
+          title: Apply Changes Immediately
+          description: Specifies whether any broker modifications are applied immediately, or during the next maintenance window.
+          type: boolean
+          default: false
+      dependencies:
+        deployment_mode:
+          oneOf:
+          - properties:
+              deployment_mode:
+                const: SINGLE_INSTANCE
+              instance_type:
+                oneOf:
+                  - title: mq.t3.micro (2 CPU & 1GiB RAM)
+                    const: mq.t3.micro
+                  - title: mq.m5.large (2 CPU & 8GiB RAM)
+                    const: mq.m5.large
+                  - title: mq.m5.xlarge (4 CPU & 16GiB RAM)
+                    const: mq.m5.xlarge
+                  - title: mq.m5.2xlarge (8 CPU & 32GiB RAM)
+                    const: mq.m5.2xlarge
+                  - title: mq.m5.4xlarge (16 CPU & 64GiB RAM)
+                    const: mq.m5.4xlarge
+          - properties:
+              deployment_mode:
+                const: CLUSTER_MULTI_AZ
+              instance_type:
+                oneOf:
+                  - title: mq.m5.large (2 CPU & 8GiB RAM)
+                    const: mq.m5.large
+                  - title: mq.m5.xlarge (4 CPU & 16GiB RAM)
+                    const: mq.m5.xlarge
+                  - title: mq.m5.2xlarge (8 CPU & 32GiB RAM)
+                    const: mq.m5.2xlarge
+                  - title: mq.m5.4xlarge (16 CPU & 64GiB RAM)
+                    const: mq.m5.4xlarge
+    monitoring:
+      title: Monitoring
+      type: object
+      required:
+        - general_logging
+        - mode
+      properties:
+        general_logging:
+          title: Enable Logging
+          description: Enables cluster logging to AWS Cloudwatch
+          type: boolean
+          default: false
+        mode:
+          title: Alarm Mode
+          description: Enable and customize CloudWatch metric alarms.
+          type: string
+          default: AUTOMATED
+          oneOf:
+            - const: AUTOMATED
+              title: Automated
+            - const: CUSTOM
+              title: Custom
+            - const: DISABLED
+              title: Disabled
+      dependencies:
+        mode:
+          oneOf:
+            - properties:
+                mode:
+                  const: AUTOMATED
+            - properties:
+                mode:
+                  const: DISABLED
+            - properties:
+                mode:
+                  const: CUSTOM
+                alarms:
+                  type: object
+                  title: Alarms
+                  properties:
+                    cpu_utilization:
+                      title: CPU Utilization
+                      type: object
+                      required:
+                        - percent
+                      properties:
+                        percent:
+                          type: number
+                          title: Percent
+                          description: The percent of CPU Utilization (aggregated across all instances) above which the alarm will trigger
+                          default: 90
+                          minimum: 0
+                          maximum: 100
+
+
+connections:
+  required:
+  - aws_authentication
+  - vpc
+  properties:
+    aws_authentication:
+      $ref: massdriver/aws-iam-role
+    vpc:
+      $ref: massdriver/aws-vpc
+
+
+artifacts:
+  required:
+    - rabbitmq
+  properties:
+    rabbitmq:
+      $ref: massdriver/rabbitmq-authentication
+
+ui:
+  ui:order:
+    - broker
+    - monitoring
+    - "*"
+  broker:
+    ui:order:
+      - deployment_mode
+      - engine_version
+      - instance_type
+      - apply_immediately
+    # engine_version:
+    #   ui:field: versioningDropdown
+  monitoring:
+    ui:order:
+      - general_logging
+      - mode
+      - alarms
+      - "*"
