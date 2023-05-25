@@ -83,7 +83,8 @@ Form input parameters for configuring a bundle for deployment.
           "instance_type": "mq.t3.micro"
       },
       "monitoring": {
-          "general_logging": false
+          "general_logging": false,
+          "mode": "AUTOMATED"
       }
   }
   ```
@@ -98,7 +99,8 @@ Form input parameters for configuring a bundle for deployment.
           "instance_type": "mq.m5.large"
       },
       "monitoring": {
-          "general_logging": true
+          "general_logging": true,
+          "mode": "AUTOMATED"
       }
   }
   ```

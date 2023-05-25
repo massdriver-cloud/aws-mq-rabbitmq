@@ -14,6 +14,7 @@ params:
         apply_immediately: false
       monitoring:
         general_logging: false
+        mode: AUTOMATED
     - __name: Multi-Broker Cluster (Production)
       broker:
         deployment_mode: CLUSTER_MULTI_AZ
@@ -22,6 +23,7 @@ params:
         apply_immediately: false
       monitoring:
         general_logging: true
+        mode: AUTOMATED
   required:
     - broker
     - monitoring
