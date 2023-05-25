@@ -7,7 +7,7 @@ resource "aws_mq_broker" "main" {
   auto_minor_version_upgrade = true
   apply_immediately          = var.broker.apply_immediately
   publicly_accessible        = false
-  storage_type               = local.storage_type
+  storage_type               = lower(local.storage_type)
   subnet_ids                 = local.subnet_ids
 
   security_groups = [aws_security_group.main.id]

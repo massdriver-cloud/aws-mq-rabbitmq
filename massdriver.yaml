@@ -1,5 +1,5 @@
 schema: draft-07
-name: "aws-rabbitmq-broker"
+name: aws-mq-rabbitmq
 description: "AWS MQ Broker for RabbitMQ is a managed message broker service that simplifies the deployment and maintenance of RabbitMQ in the AWS cloud."
 source_url: github.com/massdriver-cloud/aws-mq-rabbitmq
 type: infrastructure
@@ -100,12 +100,54 @@ params:
       type: object
       required:
         - general_logging
+        - mode
       properties:
         general_logging:
           title: Enable Logging
           description: Enables cluster logging to AWS Cloudwatch
           type: boolean
           default: false
+        mode:
+          title: Alarm Mode
+          description: Enable and customize CloudWatch metric alarms.
+          type: string
+          default: AUTOMATED
+          oneOf:
+            - const: AUTOMATED
+              title: Automated
+            - const: CUSTOM
+              title: Custom
+            - const: DISABLED
+              title: Disabled
+      dependencies:
+        mode:
+          oneOf:
+            - properties:
+                mode:
+                  const: AUTOMATED
+            - properties:
+                mode:
+                  const: DISABLED
+            - properties:
+                mode:
+                  const: CUSTOM
+                alarms:
+                  type: object
+                  title: Alarms
+                  properties:
+                    cpu_utilization:
+                      title: CPU Utilization
+                      type: object
+                      required:
+                        - percent
+                      properties:
+                        percent:
+                          type: number
+                          title: Percent
+                          description: The percent of CPU Utilization (aggregated across all instances) above which the alarm will trigger
+                          default: 90
+                          minimum: 0
+                          maximum: 100
 
 
 connections:
@@ -139,3 +181,9 @@ ui:
       - apply_immediately
     # engine_version:
     #   ui:field: versioningDropdown
+  monitoring:
+    ui:order:
+      - general_logging
+      - mode
+      - alarms
+      - "*"
