@@ -17,7 +17,7 @@ AWS MQ Broker for RabbitMQ is a managed message broker service that simplifies t
 
 ## Design
 
-For detailed information, check out our [Operator Guide](operator.mdx) for this bundle.
+For detailed information, check out our [Operator Guide](operator.md) for this bundle.
 
 ## Usage
 
