@@ -4,15 +4,22 @@
 
 AWS MQ RabbitMQ is a managed message broker service that provides a robust and scalable environment for deploying and running RabbitMQ on the AWS cloud. It reduces the operational overhead required to manage RabbitMQ, ensuring high availability and security, and integrates seamlessly with other AWS services.
 
+### Use Cases
+**Asynchronous Messaging**
+RabbitMQ is often used for asynchronous communication between different components of a distributed system. It allows decoupling of producers and consumers, where producers can send messages to RabbitMQ without waiting for an immediate response.
+**Financial Transaction Processing**
+RabbitMQ's support of AMQP provides reliable, secure and efficient communication between financial institutions, facilitating seamless payment transactions and messaging workflows.
+**Microservice Architectures**
+RabbitMQ facilitates communication and coordination between various microservices by acting as a message broker, allowing for asynchronous communication, event-driven architectures, and decoupling of services.
+
 ### Design Decisions
 
-- **Provider Configuration:** 
-  - The module is configured to use multiple providers (AWS, random, custom providers like `massdriver`).
-  - AWS region is set dynamically via variables.
+- **Broker Configuration:**
+  - Supports [single-broker configuration](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-single-instance.html) for small, cost-efficent use-cases.
+  - Supports [multi-broker configuration](https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture-cluster.html) for highly availabe, distributed messaging.
 
-- **Resource Management:**
-  - The primary resource is `aws_mq_broker`, which is configured for RabbitMQ with several properties including deployment mode, instance type, security groups, and encryption options.
-  - Encrypted using AWS KMS, with KMS policy specifically crafted for RabbitMQ.
+- **Automatic Updates:**
+  - Cluster will be kept up to date with all security patches via automatic minor version updates.
 
 - **Networking:**
   - Configured to use VPC internal subnets for better security.
@@ -25,6 +32,7 @@ AWS MQ RabbitMQ is a managed message broker service that provides a robust and s
 - **Security:**
   - Automatically generates strong, random passwords.
   - Configures the necessary IAM policy documents for access control and security.
+  - Encrypted using AWS KMS, with KMS policy specifically crafted for RabbitMQ.
 
 ### Runbook
 
@@ -100,4 +108,3 @@ If your RabbitMQ broker experiences high CPU utilization, perform the following 
 ### Summary
 
 By following the guide and utilizing the provided troubleshooting commands, you should be able to effectively manage and troubleshoot your AWS MQ RabbitMQ instances.
-
