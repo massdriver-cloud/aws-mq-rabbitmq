@@ -3,7 +3,6 @@ name: aws-mq-rabbitmq
 version: 1.0.0
 description: AWS MQ Broker for RabbitMQ is a managed message broker service that simplifies the deployment and maintenance of RabbitMQ in the AWS cloud.
 source_url: https://github.com/massdriver-cloud/aws-mq-rabbitmq
-type: application
 params:
   examples:
   - __name: Single-Broker (Development)
