@@ -5,9 +5,8 @@ locals {
 }
 
 resource "massdriver_artifact" "rabbitmq" {
-  field                = "rabbitmq"
-  provider_resource_id = var.md_metadata.name_prefix
-  name                 = "RabbitMQ authentication for ${var.md_metadata.name_prefix}"
+  field    = "rabbitmq"
+  name     = "RabbitMQ authentication for ${var.md_metadata.name_prefix}"
   artifact = jsonencode({
     data = {
       infrastructure = {
