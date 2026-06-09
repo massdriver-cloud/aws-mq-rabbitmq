@@ -103,8 +103,8 @@ Connections from other bundles that this bundle depends on.
 ## Properties
 
 - **`aws_authentication`** *(object)*: . Cannot contain additional properties.
-  - **`data`** *(object)*
-    - **`arn`** *(string)*: Amazon Resource Name.
+  - **`data`** *(object)*: Configure your AWS IAM Role connection details. Cannot contain additional properties.
+    - **`arn`** *(string)*: The Amazon Resource Name (ARN) of the IAM role that Massdriver will assume to access your AWS account. Format: arn:aws:iam::ACCOUNT_ID:role/ROLE_NAME.
 
       Examples:
       ```json
@@ -115,16 +115,7 @@ Connections from other bundles that this bundle depends on.
       "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
       ```
 
-    - **`external_id`** *(string)*: An external ID is a piece of data that can be passed to the AssumeRole API of the Security Token Service (STS). You can then use the external ID in the condition element in a role's trust policy, allowing the role to be assumed only when a certain value is present in the external ID.
-  - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
-      - **`region`** *(string)*: AWS Region to provision in.
-
-        Examples:
-        ```json
-        "us-west-2"
-        ```
-
+    - **`external_id`** *(string)*: Optional security token used to prevent confused deputy attacks. If your IAM role's trust policy requires an external ID, enter it here. This value must match the external ID condition in your role's trust policy.
 - **`vpc`** *(object)*: . Cannot contain additional properties.
   - **`data`** *(object)*
     - **`infrastructure`** *(object)*
@@ -218,9 +209,9 @@ Resources created by this bundle that can be connected to other bundles.
 <!-- ARTIFACTS:START -->
 ## Properties
 
-- **`rabbitmq`** *(object)*: RabbitMQ cluster authentication.
-  - **`data`** *(object)*
-    - **`authentication`**: RabbitMQ Authentication.
+- **`rabbitmq`** *(object)*: RabbitMQ cluster authentication. Cannot contain additional properties.
+  - **`data`** *(object)*: Cannot contain additional properties.
+    - **`authentication`**: RabbitMQ Authentication. Cannot contain additional properties.
       - **`hostname`** *(string)*
       - **`password`** *(string)*
       - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
@@ -285,8 +276,8 @@ Resources created by this bundle that can be connected to other bundles.
 
               - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
               - **`protocol`** *(string)*: Must be one of: `['tcp', 'udp']`.
-  - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
+  - **`specs`** *(object)*: Cannot contain additional properties.
+    - **`aws`** *(object)*: . Cannot contain additional properties.
       - **`region`** *(string)*: AWS Region to provision in.
 
         Examples:
@@ -294,9 +285,9 @@ Resources created by this bundle that can be connected to other bundles.
         "us-west-2"
         ```
 
-    - **`azure`** *(object)*: .
+    - **`azure`** *(object)*: . Cannot contain additional properties.
       - **`region`** *(string)*: Select the Azure region you'd like to provision your resources in.
-    - **`gcp`** *(object)*: .
+    - **`gcp`** *(object)*: . Cannot contain additional properties.
       - **`project`** *(string)*
       - **`region`** *(string)*: The GCP region to provision resources in.
 
@@ -329,7 +320,7 @@ Resources created by this bundle that can be connected to other bundles.
         "us-central1"
         ```
 
-    - **`rabbitmq`** *(object)*: RabbitMQ specific public information.
+    - **`rabbitmq`** *(object)*: RabbitMQ specific public information. Cannot contain additional properties.
       - **`version`** *(string)*: Currently deployed RabbitMQ version.
 <!-- ARTIFACTS:END -->
 

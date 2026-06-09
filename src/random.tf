@@ -1,7 +1,7 @@
 resource "random_password" "main" {
   length           = 16
   lower            = true
-  number           = true
+  numeric          = true
   special          = true
   upper            = true
   min_lower        = 1
